@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import pyaudio
+import random
+import re
 import sys
 import time
 import wave
@@ -23,15 +25,24 @@ def playSound(chunk):
 if len(sys.argv) < 3:
     print('Usage: {} bpm measure [accent_beat ...]'.format(sys.argv[0]))
     print('  120 BPM in 4/4 with accents on 1 and 3: {} 120 4 1 3'.format(sys.argv[0]))
+    print('  70 to 80 BPM in 3/8 with accent on 1: {} 70-80 3 1'.format(sys.argv[0]))
     sys.exit(1)
 
-bpm = float(sys.argv[1])
+# Determine bpm. Regex here is for "float-float" format.
+if re.match('^\d+(\.\d*)?-\d+(\.\d*)?$', sys.argv[1]):
+    a, b = sys.argv[1].split('-')
+    a, b = float(a), float(b)
+    if b < a:
+        a, b = b, a
+    bpm = float(random.random() * (b - a) + a)
+else:
+    bpm = float(sys.argv[1])
 measure = int(sys.argv[2])
 accents = list(map(lambda x: int(x) - 1, sys.argv[3:]))
 
-print(bpm)
-print(measure)
-print(accents)
+print('bpm', bpm)
+print('measure', measure)
+print('accents', accents)
 
 def main():
     delta = bpmDeltaSeconds(bpm)
